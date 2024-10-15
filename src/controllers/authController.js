@@ -54,6 +54,8 @@ const loginUser = async (req , res)=>{
       
         if (user && (await bcrypt.compare(password, user.password))) {
         
+        user.loginCount += 1; 
+        await user.save();
         const token = generateToken(user._id);
         return res
         .cookie("jwt", token, {httpOnly: true,})
