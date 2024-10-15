@@ -1,7 +1,7 @@
 const User = require('../models/userModel.js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
+const questions = require('../utils/questions.js')
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -46,35 +46,44 @@ const registerUser = async (req,res)=>{
     }
 }
 
-const loginUser = async (req , res)=>{
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    
+    if (user && (await bcrypt.compare(password, user.password))) {
+      // Increment loginCount and save the user
+      user.loginCount += 1;
+      await user.save();
 
-    try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email });
+      // Generate JWT token
+      const token = generateToken(user._id);
       
-        if (user && (await bcrypt.compare(password, user.password))) {
-        
-        user.loginCount += 1; 
-        await user.save();
-        const token = generateToken(user._id);
-        return res
-        .cookie("jwt", token, {httpOnly: true,})
+      // Check if it's the first login
+      let firstLoginQuestions = null;
+      if (user.loginCount === 1) {
+        firstLoginQuestions = questions.slice(0, 5);; 
+      }
+
+     
+      return res
+        .cookie("jwt", token, { httpOnly: true })
         .json({
           _id: user._id,
           name: user.name,
           email: user.email,
-          token: generateToken(user._id),
+          token: token,
+          firstLoginQuestions: firstLoginQuestions  
         });
-      } else {
-        res.status(401);
-        throw new Error('Invalid email or password');
-      }
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json("Internal Server Error");
+    } else {
+      res.status(401);
+      throw new Error('Invalid email or password');
     }
-}
-
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json("Internal Server Error");
+  }
+};
 
 const getUser = async (req, res) => {
     try {
