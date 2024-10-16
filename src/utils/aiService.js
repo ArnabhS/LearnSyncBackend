@@ -4,31 +4,46 @@ const cohere = new CohereClientV2({
 });
 
 const analyzeDisorders = async (questionAnswerPairs) => {
-
-  const prompt = "Analyze the following question and answer pairs to detect if the user has ADHD, Autism, Dyslexia, or other disorders.";
+  
   const inputs = questionAnswerPairs.map(
     pair => `Question: ${pair.question} | Options: ${pair.options.join(' | ')} | Answer: ${pair.answer}`
-  ).join('\n');  
+  );
 
-  
+  const prompt = `
+    For each response, provide a score between 1 to 10 for ADHD, Autism, and Dyslexia based on the user's answers:
+    ${inputs.join('\n')}
+    Respond in the format:
+    ADHD: [Score]
+    Autism: [Score]
+    Dyslexia: [Score]
+  `;
+
   const response = await cohere.chat({
     model: 'command-r-plus',
     messages: [
       {
         role: 'user',
-        content: `${prompt}\n${inputs}`,  
+        content: prompt,
       },
     ],
   });
 
-  const aiContent = response.message?.content;
-  if (!aiContent || !Array.isArray(aiContent)) {
-    throw new Error('Unexpected AI response format');
-  }
-  const disorders = aiContent.map(item => item?.text || 'Unknown Disorder'); 
+ 
+  const aiResponse = response.message?.content?.[0]?.text; 
+  const scores = {
+    adhdScore: extractScore(aiResponse, 'ADHD'),
+    autismScore: extractScore(aiResponse, 'Autism'),
+    dyslexiaScore: extractScore(aiResponse, 'Dyslexia'),
+  };
 
-  return disorders;  
-  
+  return scores;
+};
+
+// Helper function to extract scores from AI response
+const extractScore = (response, disorder) => {
+  const regex = new RegExp(`${disorder}:\\s*(\\d+)`, 'i');
+  const match = response.match(regex);
+  return match ? parseInt(match[1], 10) : 0;
 };
 
 module.exports = { analyzeDisorders };
