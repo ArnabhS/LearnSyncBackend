@@ -3,7 +3,8 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db.js');
 const cookieParser = require('cookie-parser');
-
+const authRoutes = require('./routes/authRoutes.js')
+const testRoutes = require('./routes/testRoutes.js')
 const app = express();
 
 dotenv.config();
@@ -18,6 +19,10 @@ app.use(cors({
   
 app.use(express.json());
 app.use(cookieParser());
+
+app.use('/api/v1/auth',authRoutes)
+app.use('/api/v1/test',testRoutes)
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
