@@ -10,15 +10,22 @@ const getQuestions = async( req, res)=>{
             return res.status(404).json("User not found");
         }
       
-        let firstLoginQuestions = null;
+        
+        let newQuestions = null;
         if(user.loginCount == 1){
 
-            firstLoginQuestions = questions.slice(0, 5);
+            newQuestions = questions.slice(0, 5);
+            user.loginCount +=1;
         }
-        console.log(firstLoginQuestions);
-        
+        if(user.promptsUsed == 3){
+            newQuestions = questions.slice(5, 13 );
+        }
+        if(user.promptsUsed == 6){
+          newQuestions = questions.slice(13, 21 );
+        }
+
         return res.status(200).json({
-            firstLoginQuestions
+           newQuestions
         })
     } catch (error) {
         console.log(error.message);
