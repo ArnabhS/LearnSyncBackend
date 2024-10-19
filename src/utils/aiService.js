@@ -8,7 +8,7 @@ const analyzeDisorders = async (questionAnswerPairs) => {
   const inputs = questionAnswerPairs.map(
     pair => `Question: ${pair.question} | Options: ${pair.options.join(' | ')} | Answer: ${pair.answer}`
   );
-
+  console.log(inputs ,"input")
   const prompt = `
     For each response, provide a score between 1 to 10 for ADHD, Autism, and Dyslexia based on the user's answers:
     ${inputs.join('\n')}
@@ -35,7 +35,7 @@ const analyzeDisorders = async (questionAnswerPairs) => {
     autismScore: extractScore(aiResponse, 'Autism'),
     dyslexiaScore: extractScore(aiResponse, 'Dyslexia'),
   };
-
+  console.log(scores)
   return scores;
 };
 

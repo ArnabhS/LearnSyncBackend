@@ -42,8 +42,7 @@ const userSchema = new mongoose.Schema({
     },
     detectedDisorders: [{ type: String }],  
     answers: [{ 
-        questionId: mongoose.Schema.Types.ObjectId, 
-        answer: String 
+        type: String 
     }],  
     dateTaken: { type: Date, default: Date.now }
 })

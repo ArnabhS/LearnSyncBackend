@@ -4,7 +4,7 @@ const questions = require("../utils/questions.js");
 const getQuestions = async( req, res)=>{
     try {
         const user = await User.findById(req.user._id)
-        console.log(user);
+        // console.log(user);
         
         if(!user){
             return res.status(404).json("User not found");

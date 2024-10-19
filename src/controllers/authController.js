@@ -12,7 +12,7 @@ const generateToken = (id) => {
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    console.log(name, email);
+    // console.log(name, email);
     const userExists = await User.findOne({ email });
 
     if (userExists) {
@@ -74,7 +74,7 @@ const loginUser = async (req, res) => {
       throw new Error("Invalid email or password");
     }
   } catch (error) {
-    console.log(error.message);
+    (error.message);
     res.status(500).json("Internal Server Error");
   }
 };
