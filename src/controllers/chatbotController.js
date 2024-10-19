@@ -18,7 +18,7 @@ const chatInteraction = async (req, res) => {
     if (user.promptsUsed === 3 ) {
       nextQuestions = questions.slice(6, 13);
     }
-    if(user.promptsUsed === 3){
+    if(user.promptsUsed === 6){
       nextQuestions = questions.slice(14, 21);
     }
     const aiResponse = await generateResponse(message, user.detectedDisorders);
