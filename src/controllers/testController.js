@@ -58,7 +58,20 @@ const submitAnswers = async (req, res) => {
 
   // Append new answers to the user's existing answers array
   user.answers = [...user.answers, ...answers];
-
+  
+  const totalQuestions = questions.length;
+  if (user.questionsAnswered >= totalQuestions) {
+    // Remove disorders if their scores are less than 6
+    if (adhdScore <= 5 && user.detectedDisorders.includes('ADHD')) {
+      user.detectedDisorders = user.detectedDisorders.filter(disorder => disorder !== 'ADHD');
+    }
+    if (autismScore <= 5 && user.detectedDisorders.includes('Autism')) {
+      user.detectedDisorders = user.detectedDisorders.filter(disorder => disorder !== 'Autism');
+    }
+    if (dyslexiaScore <= 5 && user.detectedDisorders.includes('Dyslexia')) {
+      user.detectedDisorders = user.detectedDisorders.filter(disorder => disorder !== 'Dyslexia');
+    }
+  }
   // Save the updated user information
   await user.save();
 
